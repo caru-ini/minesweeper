@@ -186,7 +186,7 @@ const Home = () => {
                     backgroundImage:
                       userInputs[rowIndex][colIndex] === 0 ||
                       count === 0 ||
-                      (!bombMap[rowIndex][colIndex] && (win || gameOver))
+                      (bombMap[rowIndex][colIndex] && (win || gameOver))
                         ? 'none'
                         : undefined,
                   }}
