@@ -10,33 +10,43 @@
 }
 
 .board {
+  box-sizing: border-box;
   display: grid;
-  grid-template-columns: repeat(9, 36px);
-  gap: 1px;
+  grid-template-columns: repeat(9, 32px);
   margin-top: 10px;
   background: #b2b2b2;
-  // border-color: #fff #7b7b7b #7b7b7b #fff;
+
+  /* border-color: #fff #7b7b7b #7b7b7b #fff; */
   border-color: #7b7b7b #fff #fff #7b7b7b;
   border-style: solid;
   border-width: 3px;
-  box-sizing: border-box;
 }
 
 .cell {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   font-size: 0.3rem;
   cursor: pointer;
-  background: #b2b2b2;
-  background-image: none;
+  user-select: none;
+  background: url('~/src/assets/images/icons.png') no-repeat;
+  border-color: #7b7b7b;
+  border-style: solid;
+  border-width: 1px;
+}
+
+.hiddenCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 0.3rem;
+  cursor: pointer;
+  user-select: none;
+  background: url('~/src/assets/images/icons.png') no-repeat;
   border-color: #fff #7b7b7b #7b7b7b #fff;
   border-style: solid;
   border-width: 3px;
-  user-select: none;
-  // background: url('~/src/assets/images/icons.png') no-repeat;
 }
 
 .game {
@@ -53,10 +63,10 @@
 
 .menu {
   display: flex;
-  width: 100%;
-  justify-content: space-evenly;
   align-items: center;
+  justify-content: space-evenly;
   justify-content: space-between;
+  width: 100%;
   padding: 4px;
   background: #b2b2b2;
   border-color: #7b7b7b #fff #fff #7b7b7b;
@@ -68,10 +78,10 @@
   width: 36px;
   height: 36px;
   background: url('~/src/assets/images/icons.png') no-repeat;
+  background-position: -330px 0;
   border-color: #fff #7b7b7b #7b7b7b #fff;
   border-style: solid;
   border-width: 3px;
-  background-position: -330px 0;
 }
 
 .ndisp {
