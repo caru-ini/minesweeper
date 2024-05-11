@@ -1,14 +1,26 @@
 import styles from './index.module.css';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
-type userInputType = -1 | 0 | 1 | 2; // 0: none, -1: revealed, 1: flagged, 2: question
+type userInputType = -1 | 0 | 1 | 2; // 0: none, -1: revealed, 1: question, 2: flag
 
-// const spriteIndexes = {
-//   bomb: 10,
-//   numbers: [0, 1, 2, 3, 4, 5, 6, 7],
-//   question: 8,
-//   flag: 9,
-// };
+const placeBombs = (bombMap: (0 | 1)[][], row: number, cell: number) => {
+  // place bombs randomly except for the clicked cell
+  const newBombMap = structuredClone(bombMap);
+  const bombCount = 10;
+  let bombPlaced = 0;
+  while (bombPlaced < bombCount) {
+    const randomRow = Math.floor(Math.random() * 9);
+    const randomCell = Math.floor(Math.random() * 9);
+    if (randomRow === row && randomCell === cell) {
+      continue;
+    }
+    if (newBombMap[randomRow][randomCell] === 0) {
+      newBombMap[randomRow][randomCell] = 1;
+      bombPlaced += 1;
+    }
+  }
+  return newBombMap;
+};
 
 const getCountOfBombsNearby = (bombMap: (0 | 1)[][], row: number, cell: number) => {
   let count = 0;
@@ -59,6 +71,16 @@ const revealSafeCells = (
   return newUserInputs;
 };
 
+const isWin = (bombMap: (0 | 1)[][], userInputs: userInputType[][]): boolean => {
+  if (bombMap.flat().every((cell) => cell === 0)) return false;
+  const flags: (1 | 0)[] = userInputs.flat().map((cell) => (cell === 2 ? 1 : 0));
+  return flags.every((cell, index) => cell === bombMap.flat()[index]);
+};
+
+const isGameOver = (bombMap: (0 | 1)[][], userInputs: userInputType[][]): boolean => {
+  return bombMap.flat().some((cell, index) => cell === 1 && userInputs.flat()[index] === -1);
+};
+
 const Home = () => {
   const [bombMap, setBombMap] = useState<(0 | 1)[][]>([
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -83,56 +105,54 @@ const Home = () => {
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
   ]);
 
-  const board = structuredClone(bombMap);
+  const win = isWin(bombMap, userInputs);
+  const gameOver = win ? false : isGameOver(bombMap, userInputs);
 
-  const handleCellClick = (rowIndex: number, cellIndex: number) => {
+  const reset = () => {
+    console.log('reset');
+    setBombMap(
+      Array(9)
+        .fill(null)
+        .map(() => Array(9).fill(0)),
+    );
+    setuserInputs(
+      Array(9)
+        .fill(null)
+        .map(() => Array(9).fill(0)),
+    );
+    return;
+  };
+  const handleCellClick = (rowIndex: number, colIndex: number) => {
+    if (gameOver || win) return;
     const newUserInputs = structuredClone(userInputs);
     const newBombMap = bombMap.flat().every((cell) => cell === 0)
-      ? placeBombs(bombMap, rowIndex, cellIndex)
+      ? placeBombs(bombMap, rowIndex, colIndex)
       : bombMap;
 
-    // new game
-    if (bombMap[rowIndex][cellIndex] === 1) {
-      // Game Over logic here
-
-      // Placeholder for this example
+    if (bombMap[rowIndex][colIndex] === 1) {
       console.log('Game Over');
+      setuserInputs(newBombMap.map((row) => row.map(() => -1)));
       return;
     }
 
-    // Expand safe cells
-    const revealed = revealSafeCells(newBombMap, newUserInputs, rowIndex, cellIndex);
-    console.log(revealed);
+    const revealed = revealSafeCells(newBombMap, newUserInputs, rowIndex, colIndex);
     setBombMap(newBombMap);
     setuserInputs(structuredClone(revealed) as userInputType[][]);
     return;
   };
 
-  const handleCellRClick = (rowIndex: number, cellIndex: number) => {
-    if (userInputs[rowIndex][cellIndex] === -1) return;
+  const handleCellRClick = (rowIndex: number, colIndex: number) => {
+    if (gameOver || win) return;
+    if (userInputs[rowIndex][colIndex] === -1) return;
     const newUserInputs = structuredClone(userInputs);
-    const currentInput = newUserInputs[rowIndex][cellIndex];
-    newUserInputs[rowIndex][cellIndex] = currentInput === 0 ? 2 : currentInput === 2 ? 1 : 0;
-    setuserInputs(newUserInputs);
-  };
-
-  const placeBombs = (bombMap: (0 | 1)[][], row: number, cell: number) => {
-    // place bombs randomly except for the clicked cell
-    const newBombMap = structuredClone(bombMap);
-    const bombCount = 10;
-    let bombPlaced = 0;
-    while (bombPlaced < bombCount) {
-      const randomRow = Math.floor(Math.random() * 9);
-      const randomCell = Math.floor(Math.random() * 9);
-      if (randomRow === row && randomCell === cell) {
-        continue;
-      }
-      if (newBombMap[randomRow][randomCell] === 0) {
-        newBombMap[randomRow][randomCell] = 1;
-        bombPlaced += 1;
-      }
+    const currentInput = newUserInputs[rowIndex][colIndex];
+    newUserInputs[rowIndex][colIndex] = currentInput === 0 ? 2 : currentInput === 2 ? 1 : 0;
+    if (isWin(bombMap, newUserInputs)) {
+      console.log('Win');
+      setuserInputs(newUserInputs.map((row) => row.map((c) => (c === 2 ? 2 : -1))));
+      return;
     }
-    return newBombMap;
+    setuserInputs(newUserInputs);
   };
 
   return (
@@ -140,45 +160,55 @@ const Home = () => {
       <div className={styles.game}>
         <div className={styles.menu}>
           <div className={styles.ndisp}>10</div>
-          <div className={styles.smiley} />
+          <div
+            className={styles.smiley}
+            onClick={reset}
+            style={{ backgroundPositionX: win ? '-360px' : gameOver ? '-390px' : '-330px' }}
+          />
           <div className={styles.ndisp} />
         </div>
         <div className={styles.board}>
-          {board.map((row, rowIndex) => (
-            <div key={rowIndex}>
-              {row.map((cell, cellIndex) => {
-                const count = getCountOfBombsNearby(bombMap, rowIndex, cellIndex);
-                const position =
-                  userInputs[rowIndex][cellIndex] > 0
-                    ? `-${(userInputs[rowIndex][cellIndex] + 7) * 30}px`
+          {bombMap.map((row, rowIndex) =>
+            row.map((cell, colIndex) => {
+              const count = getCountOfBombsNearby(bombMap, rowIndex, colIndex);
+              const position = win
+                ? '-270px'
+                : gameOver
+                  ? `-${(cell === 1 ? 10 : 0) * 30}px`
+                  : userInputs[rowIndex][colIndex] > 0
+                    ? `-${(userInputs[rowIndex][colIndex] + 7) * 30}px`
                     : `-${(count - 1) * 30}px`;
-                return (
-                  <div
-                    key={cellIndex}
-                    style={{
-                      backgroundPositionX: position,
-                      backgroundImage:
-                        userInputs[rowIndex][cellIndex] === 0 || count === 0 ? 'none' : undefined,
-                    }}
-                    className={
-                      userInputs[rowIndex][cellIndex] !== -1 ? styles.hiddenCell : styles.cell
-                    }
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleCellClick(rowIndex, cellIndex);
-                    }}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      handleCellRClick(rowIndex, cellIndex);
-                    }}
-                  >
-                    {count}
-                    {cell === 1 ? '💣' : ''}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
+              return (
+                <div
+                  key={`${rowIndex}-${colIndex}`}
+                  style={{
+                    backgroundPositionX: position,
+                    backgroundImage:
+                      userInputs[rowIndex][colIndex] === 0 ||
+                      count === 0 ||
+                      (!bombMap[rowIndex][colIndex] && (win || gameOver))
+                        ? 'none'
+                        : undefined,
+                  }}
+                  className={
+                    userInputs[rowIndex][colIndex] === -1 || win ? styles.cell : styles.hiddenCell
+                  }
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleCellClick(rowIndex, colIndex);
+                  }}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    handleCellRClick(rowIndex, colIndex);
+                  }}
+                >
+                  {/* debug
+                  {/* {count}
+                  {cell === 1 ? '💣' : ''} */}
+                </div>
+              );
+            }),
+          )}
         </div>
       </div>
     </div>
