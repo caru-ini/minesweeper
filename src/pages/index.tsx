@@ -158,7 +158,7 @@ const Home = () => {
                     style={{
                       backgroundPositionX: position,
                       backgroundImage:
-                        userInputs[rowIndex][cellIndex] === 0 || count === 0 ? 'none' : false,
+                        userInputs[rowIndex][cellIndex] === 0 || count === 0 ? 'none' : undefined,
                     }}
                     className={
                       userInputs[rowIndex][cellIndex] !== -1 ? styles.hiddenCell : styles.cell
