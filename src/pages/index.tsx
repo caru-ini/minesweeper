@@ -99,7 +99,7 @@ const calculatePosition = (
   colIndex: number,
   count: number,
 ): string => {
-  if (win) return '-270px';
+  if (win) return '-269px'; // hack: なぜか右のスプライトが見えてしまうので
   if (gameOver) return `-${(cell === 1 ? 10 : 0) * 30}px`;
   if (userInputs[rowIndex][colIndex] > 0) return `-${(userInputs[rowIndex][colIndex] + 7) * 30}px`;
   return `-${(count - 1) * 30}px`;
