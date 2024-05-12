@@ -90,6 +90,47 @@ const formatTimeToDisplay = (time: number) => {
   return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };
 
+const calculatePosition = (
+  cell: number,
+  win: boolean,
+  gameOver: boolean,
+  userInputs: userInputType[][],
+  rowIndex: number,
+  colIndex: number,
+  count: number,
+): string => {
+  if (win) return '-270px';
+  if (gameOver) return `-${(cell === 1 ? 10 : 0) * 30}px`;
+  if (userInputs[rowIndex][colIndex] > 0) return `-${(userInputs[rowIndex][colIndex] + 7) * 30}px`;
+  return `-${(count - 1) * 30}px`;
+};
+
+const shouldHideBackgroundImage = (
+  userInputs: userInputType[][],
+  rowIndex: number,
+  colIndex: number,
+  count: number,
+  bombMap: (0 | 1)[][],
+  gameOver: boolean,
+  win: boolean,
+): boolean => {
+  return (
+    userInputs[rowIndex][colIndex] === 0 ||
+    (userInputs[rowIndex][colIndex] <= 0 && count === 0) ||
+    (!bombMap[rowIndex][colIndex] && (gameOver || win))
+  );
+};
+
+const getClassName = (
+  userInputs: userInputType[][],
+  rowIndex: number,
+  colIndex: number,
+  win: boolean,
+  styles: any,
+): string => {
+  return userInputs[rowIndex][colIndex] === -1 || win ? styles.cell : styles.hiddenCell;
+};
+
 const Home = () => {
   const [time, setTime] = useState(0);
   const [bombMap, setBombMap] = useState<(0 | 1)[][]>([
@@ -195,24 +236,31 @@ const Home = () => {
           {bombMap.map((row, rowIndex) =>
             row.map((cell, colIndex) => {
               const count = getCountOfBombsNearby(bombMap, rowIndex, colIndex);
-              const position = win
-                ? '-270px'
-                : gameOver
-                  ? `-${(cell === 1 ? 10 : 0) * 30}px`
-                  : userInputs[rowIndex][colIndex] > 0
-                    ? `-${(userInputs[rowIndex][colIndex] + 7) * 30}px`
-                    : `-${(count - 1) * 30}px`;
+              const position = calculatePosition(
+                cell,
+                win,
+                gameOver,
+                userInputs,
+                rowIndex,
+                colIndex,
+                count,
+              );
               return (
                 <div
                   key={`${rowIndex}-${colIndex}`}
                   style={{
                     backgroundPositionX: position,
-                    backgroundImage:
-                      userInputs[rowIndex][colIndex] === 0 ||
-                      (userInputs[rowIndex][colIndex] <= 0 && count === 0) ||
-                      (!bombMap[rowIndex][colIndex] && (gameOver || win))
-                        ? 'none'
-                        : undefined,
+                    backgroundImage: shouldHideBackgroundImage(
+                      userInputs,
+                      rowIndex,
+                      colIndex,
+                      count,
+                      bombMap,
+                      gameOver,
+                      win,
+                    )
+                      ? 'none'
+                      : undefined,
                   }}
                   className={
                     userInputs[rowIndex][colIndex] === -1 || win ? styles.cell : styles.hiddenCell
