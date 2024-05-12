@@ -3,10 +3,12 @@ import { useEffect, useState } from 'react';
 
 type userInputType = -1 | 0 | 1 | 2; // 0: none, -1: revealed, 1: question, 2: flag
 
+const BOMBS = 10;
+
 const placeBombs = (bombMap: (0 | 1)[][], row: number, cell: number) => {
   // place bombs randomly except for the clicked cell
   const newBombMap = structuredClone(bombMap);
-  const bombCount = 10;
+  const bombCount = BOMBS;
   let bombPlaced = 0;
   while (bombPlaced < bombCount) {
     const randomRow = Math.floor(Math.random() * 9);
@@ -178,7 +180,10 @@ const Home = () => {
     <div className={styles.container}>
       <div className={styles.game}>
         <div className={styles.menu}>
-          <div className={styles.ndisp} />
+          <div className={styles.ndisp}>
+            {bombMap.flat().filter((cell) => cell === 1).length -
+              userInputs.flat().filter((cell) => cell === 2).length}
+          </div>
           <div
             className={styles.smiley}
             onClick={reset}
