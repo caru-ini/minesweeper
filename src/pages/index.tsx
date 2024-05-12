@@ -39,6 +39,20 @@ const getCountOfBombsNearby = (bombMap: (0 | 1)[][], row: number, cell: number) 
   return count;
 };
 
+const getAdjacentCells = (row: number, cell: number, bombMap: (0 | 1)[][]): [number, number][] => {
+  const adjacentCells: [number, number][] = [];
+  for (let x = -1; x <= 1; x++) {
+    for (let y = -1; y <= 1; y++) {
+      const newX = row + x;
+      const newY = cell + y;
+      if (newX >= 0 && newX < bombMap.length && newY >= 0 && newY < bombMap[0].length) {
+        adjacentCells.push([newX, newY]);
+      }
+    }
+  }
+  return adjacentCells;
+};
+
 const revealSafeCells = (
   bombMap: (0 | 1)[][],
   userInputs: userInputType[][],
@@ -53,21 +67,7 @@ const revealSafeCells = (
     const bombsNearby = getCountOfBombsNearby(bombMap, currentRow, currentCell);
     newUserInputs[currentRow][currentCell] = -1;
     if (bombsNearby === 0) {
-      for (let x = -1; x <= 1; x++) {
-        for (let y = -1; y <= 1; y++) {
-          const newX = currentRow + x;
-          const newY = currentCell + y;
-          if (
-            newX >= 0 &&
-            newX < bombMap.length &&
-            newY >= 0 &&
-            newY < bombMap[0].length
-            // newUserInputs[newX][newY] === 0
-          ) {
-            stack.push([newX, newY]);
-          }
-        }
-      }
+      stack.push(...getAdjacentCells(currentRow, currentCell, bombMap));
     }
   }
   return newUserInputs;
