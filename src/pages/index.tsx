@@ -1,5 +1,5 @@
 import styles from './index.module.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type userInputType = -1 | 0 | 1 | 2; // 0: none, -1: revealed, 1: question, 2: flag
 
@@ -81,7 +81,15 @@ const isGameOver = (bombMap: (0 | 1)[][], userInputs: userInputType[][]): boolea
   return bombMap.flat().some((cell, index) => cell === 1 && userInputs.flat()[index] === -1);
 };
 
+const formatTimeToDisplay = (time: number) => {
+  // 00:00
+  const minutes = Math.floor(time / 60);
+  const seconds = time % 60;
+  return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+};
+
 const Home = () => {
+  const [time, setTime] = useState(0);
   const [bombMap, setBombMap] = useState<(0 | 1)[][]>([
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -108,6 +116,16 @@ const Home = () => {
   const win = isWin(bombMap, userInputs);
   const gameOver = win ? false : isGameOver(bombMap, userInputs);
 
+  // timer
+  useEffect(() => {
+    if (win || gameOver || bombMap.flat().every((cell) => cell === 0)) return;
+    const interval = setInterval(() => {
+      console.log('tick');
+      setTime((time) => time + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [win, gameOver, bombMap]);
+
   const reset = () => {
     console.log('reset');
     setBombMap(
@@ -120,6 +138,7 @@ const Home = () => {
         .fill(null)
         .map(() => Array(9).fill(0)),
     );
+    setTime(0);
     return;
   };
   const handleCellClick = (rowIndex: number, colIndex: number) => {
@@ -159,13 +178,13 @@ const Home = () => {
     <div className={styles.container}>
       <div className={styles.game}>
         <div className={styles.menu}>
-          <div className={styles.ndisp}>10</div>
+          <div className={styles.ndisp} />
           <div
             className={styles.smiley}
             onClick={reset}
             style={{ backgroundPositionX: win ? '-360px' : gameOver ? '-390px' : '-330px' }}
           />
-          <div className={styles.ndisp} />
+          <div className={styles.ndisp}>{formatTimeToDisplay(time)}</div>
         </div>
         <div className={styles.board}>
           {bombMap.map((row, rowIndex) =>
@@ -185,7 +204,7 @@ const Home = () => {
                     backgroundPositionX: position,
                     backgroundImage:
                       userInputs[rowIndex][colIndex] === 0 ||
-                      count === 0 ||
+                      (userInputs[rowIndex][colIndex] <= 0 && count === 0) ||
                       (!bombMap[rowIndex][colIndex] && (gameOver || win))
                         ? 'none'
                         : undefined,
@@ -202,9 +221,9 @@ const Home = () => {
                     handleCellRClick(rowIndex, colIndex);
                   }}
                 >
-                  {/* debug
-                  {/* {count}
-                  {cell === 1 ? '💣' : ''} */}
+                  {/* debug*/}
+                  {/* {count}*/}
+                  {/* {cell === 1 ? '💣' : ''} */}
                 </div>
               );
             }),
