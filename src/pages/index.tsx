@@ -126,7 +126,7 @@ const getClassName = (
   rowIndex: number,
   colIndex: number,
   win: boolean,
-  styles: any,
+  styles: { readonly [key: string]: string },
 ): string => {
   return userInputs[rowIndex][colIndex] === -1 || win ? styles.cell : styles.hiddenCell;
 };
