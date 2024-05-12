@@ -262,9 +262,7 @@ const Home = () => {
                       ? 'none'
                       : undefined,
                   }}
-                  className={
-                    userInputs[rowIndex][colIndex] === -1 || win ? styles.cell : styles.hiddenCell
-                  }
+                  className={getClassName(userInputs, rowIndex, colIndex, win, styles)}
                   onClick={(e) => {
                     e.preventDefault();
                     handleCellClick(rowIndex, colIndex);
