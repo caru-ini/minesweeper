@@ -186,6 +186,7 @@ const Home = () => {
   };
   const handleCellClick = (rowIndex: number, colIndex: number) => {
     if (gameOver || win) return;
+    if (userInputs[rowIndex][colIndex] > 0) return;
     const newUserInputs = structuredClone(userInputs);
     const newBombMap = bombMap.flat().every((cell) => cell === 0)
       ? placeBombs(bombMap, rowIndex, colIndex)
