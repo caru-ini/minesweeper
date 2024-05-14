@@ -45,7 +45,6 @@ const createEmptyBoard = (rows: number, cols: number): (0 | 1)[][] => {
 };
 
 const placeBombs = (bombMap: (0 | 1)[][], row: number, cell: number, option: boardOptionType) => {
-  // place bombs randomly except for the clicked cell
   const newBombMap = structuredClone(bombMap);
   let bombPlaced = 0;
   while (bombPlaced < option.bombs) {
@@ -62,6 +61,22 @@ const placeBombs = (bombMap: (0 | 1)[][], row: number, cell: number, option: boa
   return newBombMap;
 };
 
+const iterateAdjacentCells = (
+  row: number,
+  cell: number,
+  option: boardOptionType,
+  callback: (i: number, j: number) => void,
+) => {
+  for (let i = row - 1; i <= row + 1; i += 1) {
+    for (let j = cell - 1; j <= cell + 1; j += 1) {
+      if (i < 0 || i >= option.rows || j < 0 || j >= option.cols) {
+        continue;
+      }
+      callback(i, j);
+    }
+  }
+};
+
 const getCountOfBombsNearby = (
   bombMap: (0 | 1)[][],
   row: number,
@@ -69,30 +84,23 @@ const getCountOfBombsNearby = (
   option: boardOptionType,
 ) => {
   let count = 0;
-  for (let i = row - 1; i <= row + 1; i += 1) {
-    for (let j = cell - 1; j <= cell + 1; j += 1) {
-      if (i < 0 || i >= option.rows || j < 0 || j >= option.cols) {
-        continue;
-      }
-      if (bombMap[i][j] === 1) {
-        count += 1;
-      }
+  iterateAdjacentCells(row, cell, option, (i, j) => {
+    if (bombMap[i][j]) {
+      count += 1;
     }
-  }
+  });
   return count;
 };
 
-const getAdjacentCells = (row: number, cell: number, bombMap: (0 | 1)[][]): [number, number][] => {
+const getAdjacentCells = (
+  row: number,
+  cell: number,
+  option: boardOptionType,
+): [number, number][] => {
   const adjacentCells: [number, number][] = [];
-  for (let x = -1; x <= 1; x++) {
-    for (let y = -1; y <= 1; y++) {
-      const newX = row + x;
-      const newY = cell + y;
-      if (newX >= 0 && newX < bombMap.length && newY >= 0 && newY < bombMap[0].length) {
-        adjacentCells.push([newX, newY]);
-      }
-    }
-  }
+  iterateAdjacentCells(row, cell, option, (i, j) => {
+    adjacentCells.push([i, j]);
+  });
   return adjacentCells;
 };
 
@@ -111,7 +119,7 @@ const revealSafeCells = (
     const bombsNearby = getCountOfBombsNearby(bombMap, currentRow, currentCell, boardOption);
     newUserInputs[currentRow][currentCell] = -1;
     if (bombsNearby === 0) {
-      stack.push(...getAdjacentCells(currentRow, currentCell, bombMap));
+      stack.push(...getAdjacentCells(currentRow, currentCell, boardOption));
     }
   }
   return newUserInputs;
@@ -389,9 +397,7 @@ const Home = () => {
                     handleCellRClick(rowIndex, colIndex);
                   }}
                 >
-                  {/* debug*/}
-                  {/* {count}*/}
-                  {/* {cell} */}
+                  {/* debug & cheat */}
                   {/* {userInputs[rowIndex][colIndex]} */}
                   {/* {cell === 1 ? '💣' : ''} */}
                 </div>
