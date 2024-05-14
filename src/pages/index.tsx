@@ -214,12 +214,10 @@ const Home = () => {
   const win = isWin(bombMap, userInputs);
   const gameOver = win ? false : isGameOver(bombMap, userInputs);
 
-  // timer
+  // Timer
   useEffect(() => {
     if (win || gameOver || bombMap.flat().every((cell) => cell === 0)) return;
-    const interval = setInterval(() => {
-      setTime((time) => time + 1);
-    }, 1000);
+    const interval = setInterval(() => setTime((prev) => prev + 1), 1000);
     return () => clearInterval(interval);
   }, [win, gameOver, bombMap]);
 
