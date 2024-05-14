@@ -30,7 +30,7 @@ const difficulties: {
     bombs: 99,
     custom: false,
   },
-  cutsom: {
+  custom: {
     rows: 30,
     cols: 30,
     bombs: 150,
@@ -281,7 +281,7 @@ const Home = () => {
         <button onClick={() => setDifficulty(difficulties.easy)}>初級</button>
         <button onClick={() => setDifficulty(difficulties.medium)}>中級</button>
         <button onClick={() => setDifficulty(difficulties.hard)}>上級</button>
-        <button onClick={() => setDifficulty(difficulties.cutsom)}>カスタム</button>
+        <button onClick={() => setDifficulty(difficulties.custom)}>カスタム</button>
       </div>
       {boardOption.custom ? (
         <div className={styles.options}>
