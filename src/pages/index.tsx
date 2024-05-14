@@ -135,13 +135,6 @@ const isGameOver = (bombMap: (0 | 1)[][], userInputs: userInputType[][]): boolea
   return bombMap.flat().some((cell, index) => cell === 1 && userInputs.flat()[index] === -1);
 };
 
-const formatTimeToDisplay = (time: number) => {
-  // 00:00
-  const minutes = Math.floor(time / 60);
-  const seconds = time % 60;
-  return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-};
-
 const calculatePosition = (
   cell: number,
   win: boolean,
@@ -293,7 +286,7 @@ const Home = () => {
       {boardOption.custom ? (
         <div className={styles.options}>
           <div className={styles.optItem}>
-            <label>幅</label>
+            <label>幅:</label>
             <input
               type="number"
               value={customOptionBuff.cols}
@@ -303,7 +296,7 @@ const Home = () => {
             />
           </div>
           <div className={styles.optItem}>
-            <label>高さ</label>
+            <label>高さ:</label>
             <input
               type="number"
               value={customOptionBuff.rows}
@@ -313,7 +306,7 @@ const Home = () => {
             />
           </div>
           <div className={styles.optItem}>
-            <label>爆弾の数</label>
+            <label>爆弾の数:</label>
             <input
               type="number"
               value={customOptionBuff.bombs}
@@ -341,15 +334,19 @@ const Home = () => {
       <div className={styles.game}>
         <div className={styles.menu}>
           <div className={styles.ndisp}>
-            {bombMap.flat().filter((cell) => cell === 1).length -
-              userInputs.flat().filter((cell) => cell === 2).length}
+            {(
+              bombMap.flat().filter((cell) => cell === 1).length -
+              userInputs.flat().filter((cell) => cell === 2).length
+            )
+              .toString()
+              .padStart(3, '0')}
           </div>
           <div
             className={styles.smiley}
             onClick={reset}
             style={{ backgroundPositionX: win ? '-360px' : gameOver ? '-390px' : '-330px' }}
           />
-          <div className={styles.ndisp}>{formatTimeToDisplay(time)}</div>
+          <div className={styles.ndisp}>{`${time.toString().padStart(3, '0')}`}</div>
         </div>
         <div
           className={styles.board}
