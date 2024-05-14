@@ -184,9 +184,9 @@ const Home = () => {
     cols: number;
     bombs: number;
   }>({
-    rows: 9,
-    cols: 9,
-    bombs: 10,
+    rows: 30,
+    cols: 30,
+    bombs: 150,
   });
   const [bombMap, setBombMap] = useState<(0 | 1)[][]>([
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
