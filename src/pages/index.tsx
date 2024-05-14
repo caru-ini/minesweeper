@@ -276,7 +276,7 @@ const Home = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.difficulty}>
+      <div>
         <button onClick={() => setDifficulty(difficulties.easy)}>初級</button>
         <button onClick={() => setDifficulty(difficulties.medium)}>中級</button>
         <button onClick={() => setDifficulty(difficulties.hard)}>上級</button>
