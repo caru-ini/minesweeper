@@ -23,6 +23,7 @@
 
 .optItem label {
   margin-right: 10px;
+  color: white;
 }
 
 .optItem input[type='number'] {
