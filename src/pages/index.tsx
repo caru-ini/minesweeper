@@ -163,7 +163,6 @@ const Home = () => {
   useEffect(() => {
     if (win || gameOver || bombMap.flat().every((cell) => cell === 0)) return;
     const interval = setInterval(() => {
-      console.log('tick');
       setTime((time) => time + 1);
     }, 1000);
     return () => clearInterval(interval);
