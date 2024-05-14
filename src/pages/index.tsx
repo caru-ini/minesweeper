@@ -2,17 +2,55 @@ import styles from './index.module.css';
 import { useEffect, useState } from 'react';
 
 type userInputType = -1 | 0 | 1 | 2; // 0: none, -1: revealed, 1: question, 2: flag
+type boardOptionType = {
+  rows: number;
+  cols: number;
+  bombs: number;
+  custom: boolean;
+};
 
-const BOMBS = 10;
+const difficulties: {
+  [key: string]: boardOptionType;
+} = {
+  easy: {
+    rows: 9,
+    cols: 9,
+    bombs: 10,
+    custom: false,
+  },
+  medium: {
+    rows: 16,
+    cols: 16,
+    bombs: 40,
+    custom: false,
+  },
+  hard: {
+    rows: 16,
+    cols: 30,
+    bombs: 99,
+    custom: false,
+  },
+  cutsom: {
+    rows: 30,
+    cols: 30,
+    bombs: 150,
+    custom: true,
+  },
+};
 
-const placeBombs = (bombMap: (0 | 1)[][], row: number, cell: number) => {
+const createEmptyBoard = (rows: number, cols: number): (0 | 1)[][] => {
+  return Array(rows)
+    .fill(null)
+    .map(() => Array(cols).fill(0));
+};
+
+const placeBombs = (bombMap: (0 | 1)[][], row: number, cell: number, option: boardOptionType) => {
   // place bombs randomly except for the clicked cell
   const newBombMap = structuredClone(bombMap);
-  const bombCount = BOMBS;
   let bombPlaced = 0;
-  while (bombPlaced < bombCount) {
-    const randomRow = Math.floor(Math.random() * 9);
-    const randomCell = Math.floor(Math.random() * 9);
+  while (bombPlaced < option.bombs) {
+    const randomRow = Math.floor(Math.random() * option.rows);
+    const randomCell = Math.floor(Math.random() * option.cols);
     if (randomRow === row && randomCell === cell) {
       continue;
     }
@@ -24,11 +62,16 @@ const placeBombs = (bombMap: (0 | 1)[][], row: number, cell: number) => {
   return newBombMap;
 };
 
-const getCountOfBombsNearby = (bombMap: (0 | 1)[][], row: number, cell: number) => {
+const getCountOfBombsNearby = (
+  bombMap: (0 | 1)[][],
+  row: number,
+  cell: number,
+  option: boardOptionType,
+) => {
   let count = 0;
   for (let i = row - 1; i <= row + 1; i += 1) {
     for (let j = cell - 1; j <= cell + 1; j += 1) {
-      if (i < 0 || i >= 9 || j < 0 || j >= 9) {
+      if (i < 0 || i >= option.rows || j < 0 || j >= option.cols) {
         continue;
       }
       if (bombMap[i][j] === 1) {
@@ -58,13 +101,14 @@ const revealSafeCells = (
   userInputs: userInputType[][],
   row: number,
   cell: number,
+  boardOption: boardOptionType,
 ) => {
   const newUserInputs = structuredClone(userInputs);
   const stack = [[row, cell]];
   while (stack.length > 0) {
     const [currentRow, currentCell] = stack.pop() as [number, number];
     if (newUserInputs[currentRow][currentCell] !== 0) continue;
-    const bombsNearby = getCountOfBombsNearby(bombMap, currentRow, currentCell);
+    const bombsNearby = getCountOfBombsNearby(bombMap, currentRow, currentCell, boardOption);
     newUserInputs[currentRow][currentCell] = -1;
     if (bombsNearby === 0) {
       stack.push(...getAdjacentCells(currentRow, currentCell, bombMap));
@@ -133,6 +177,16 @@ const getClassName = (
 
 const Home = () => {
   const [time, setTime] = useState(0);
+  const [boardOption, setBoardOption] = useState<boardOptionType>(difficulties.easy);
+  const [customOptionBuff, setCustomOptionBuff] = useState<{
+    rows: number;
+    cols: number;
+    bombs: number;
+  }>({
+    rows: 9,
+    cols: 9,
+    bombs: 10,
+  });
   const [bombMap, setBombMap] = useState<(0 | 1)[][]>([
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -169,26 +223,17 @@ const Home = () => {
   }, [win, gameOver, bombMap]);
 
   const reset = () => {
-    console.log('reset');
-    setBombMap(
-      Array(9)
-        .fill(null)
-        .map(() => Array(9).fill(0)),
-    );
-    setuserInputs(
-      Array(9)
-        .fill(null)
-        .map(() => Array(9).fill(0)),
-    );
     setTime(0);
-    return;
+    setBombMap(createEmptyBoard(boardOption.rows, boardOption.cols));
+    setuserInputs(createEmptyBoard(boardOption.rows, boardOption.cols) as userInputType[][]);
   };
+
   const handleCellClick = (rowIndex: number, colIndex: number) => {
     if (gameOver || win) return;
     if (userInputs[rowIndex][colIndex] > 0) return;
     const newUserInputs = structuredClone(userInputs);
     const newBombMap = bombMap.flat().every((cell) => cell === 0)
-      ? placeBombs(bombMap, rowIndex, colIndex)
+      ? placeBombs(bombMap, rowIndex, colIndex, boardOption)
       : bombMap;
 
     if (bombMap[rowIndex][colIndex] === 1) {
@@ -197,7 +242,7 @@ const Home = () => {
       return;
     }
 
-    const revealed = revealSafeCells(newBombMap, newUserInputs, rowIndex, colIndex);
+    const revealed = revealSafeCells(newBombMap, newUserInputs, rowIndex, colIndex, boardOption);
     setBombMap(newBombMap);
     setuserInputs(structuredClone(revealed) as userInputType[][]);
     return;
@@ -217,8 +262,74 @@ const Home = () => {
     setuserInputs(newUserInputs);
   };
 
+  const setDifficulty = (difficulty: {
+    rows: number;
+    cols: number;
+    bombs: number;
+    custom: boolean;
+  }) => {
+    setBoardOption(difficulty);
+    setTime(0);
+    setBombMap(createEmptyBoard(difficulty.rows, difficulty.cols));
+    setuserInputs(createEmptyBoard(difficulty.rows, difficulty.cols) as userInputType[][]);
+  };
+
   return (
     <div className={styles.container}>
+      <div className={styles.difficulty}>
+        <button onClick={() => setDifficulty(difficulties.easy)}>初級</button>
+        <button onClick={() => setDifficulty(difficulties.medium)}>中級</button>
+        <button onClick={() => setDifficulty(difficulties.hard)}>上級</button>
+        <button onClick={() => setDifficulty(difficulties.cutsom)}>カスタム</button>
+      </div>
+      {boardOption.custom ? (
+        <div className={styles.options}>
+          <div className={styles.optItem}>
+            <label>幅</label>
+            <input
+              type="number"
+              value={customOptionBuff.cols}
+              onChange={(e) =>
+                setCustomOptionBuff({ ...customOptionBuff, cols: Number(e.target.value) })
+              }
+            />
+          </div>
+          <div className={styles.optItem}>
+            <label>高さ</label>
+            <input
+              type="number"
+              value={customOptionBuff.rows}
+              onChange={(e) =>
+                setCustomOptionBuff({ ...customOptionBuff, rows: Number(e.target.value) })
+              }
+            />
+          </div>
+          <div className={styles.optItem}>
+            <label>爆弾の数</label>
+            <input
+              type="number"
+              value={customOptionBuff.bombs}
+              onChange={(e) =>
+                setCustomOptionBuff({ ...customOptionBuff, bombs: Number(e.target.value) })
+              }
+            />
+          </div>
+          <button
+            className={styles.optItem}
+            onClick={() => {
+              console.log(customOptionBuff);
+              setDifficulty({
+                rows: customOptionBuff.rows,
+                cols: customOptionBuff.cols,
+                bombs: customOptionBuff.bombs,
+                custom: true,
+              });
+            }}
+          >
+            反映
+          </button>
+        </div>
+      ) : null}
       <div className={styles.game}>
         <div className={styles.menu}>
           <div className={styles.ndisp}>
@@ -232,10 +343,16 @@ const Home = () => {
           />
           <div className={styles.ndisp}>{formatTimeToDisplay(time)}</div>
         </div>
-        <div className={styles.board}>
+        <div
+          className={styles.board}
+          style={{
+            gridTemplateColumns: `repeat(${boardOption.cols}, 32px)`,
+            gridTemplateRows: `repeat(${boardOption.rows}, 32px)`,
+          }}
+        >
           {bombMap.map((row, rowIndex) =>
             row.map((cell, colIndex) => {
-              const count = getCountOfBombsNearby(bombMap, rowIndex, colIndex);
+              const count = getCountOfBombsNearby(bombMap, rowIndex, colIndex, boardOption);
               const position = calculatePosition(
                 cell,
                 win,
@@ -274,6 +391,8 @@ const Home = () => {
                 >
                   {/* debug*/}
                   {/* {count}*/}
+                  {/* {cell} */}
+                  {/* {userInputs[rowIndex][colIndex]} */}
                   {/* {cell === 1 ? '💣' : ''} */}
                 </div>
               );

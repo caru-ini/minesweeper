@@ -9,6 +9,26 @@
   background: #595656;
 }
 
+.options {
+  display: flex;
+  gap: 10px;
+  margin: 10px;
+}
+
+.optItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.optItem label {
+  margin-right: 10px;
+}
+
+.optItem input[type='number'] {
+  width: 3rem;
+}
+
 .board {
   box-sizing: border-box;
   display: grid;
@@ -84,6 +104,10 @@
   border-color: #fff #7b7b7b #7b7b7b #fff;
   border-style: solid;
   border-width: 3px;
+}
+
+.smiley:active {
+  border-color: #7b7b7b #fff #fff #7b7b7b;
 }
 
 .ndisp {
