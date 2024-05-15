@@ -82,7 +82,6 @@ const revealSafeCells = (
   const newUserInputs = structuredClone(userInputs);
 
   const revealCell = (row: number, cell: number) => {
-    // Check boundaries and if the cell is already revealed
     if (
       row < 0 ||
       row >= boardOption.rows ||
@@ -93,12 +92,9 @@ const revealSafeCells = (
       return;
     }
 
-    // Count the number of bombs nearby
     const bombsNearby = getCountOfBombsNearby(bombMap, row, cell, boardOption);
-    // Mark the cell as revealed
     newUserInputs[row][cell] = -1;
 
-    // If there are no bombs nearby, reveal adjacent cells
     if (bombsNearby === 0) {
       for (let i = row - 1; i <= row + 1; i += 1) {
         for (let j = cell - 1; j <= cell + 1; j += 1) {
