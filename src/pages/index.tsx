@@ -312,12 +312,8 @@ const Home = () => {
       <div className={styles.game}>
         <div className={styles.menu}>
           <div className={styles.ndisp}>
-            {(
-              bombMap.flat().filter((cell) => cell === 1).length -
-              userInputs.flat().filter((cell) => cell === 2).length
-            )
-              .toString()
-              .padStart(3, '0')}
+            {bombMap.flat().filter((cell) => cell === 1).length -
+              userInputs.flat().filter((cell) => cell === 2).length}
           </div>
           <div
             className={styles.smiley}
