@@ -3,36 +3,45 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
   min-height: 100vh;
   padding: 0 0.5rem;
   background: #595656;
 }
 
-.options {
+.customOptions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.fields {
   display: flex;
   gap: 10px;
   margin: 10px;
 }
 
-.optItem {
+.item {
   display: flex;
   align-items: center;
 }
 
-.optItem label {
+.item label {
   margin-right: 10px;
   color: white;
 }
 
-.optItem input[type='number'] {
+.item input[type='number'] {
   width: 3rem;
+}
+
+.error {
+  color: rgb(255 128 128);
 }
 
 .board {
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: repeat(9, minmax(0, 1fr));
   margin-top: 10px;
   background: #b2b2b2;
 
@@ -43,9 +52,8 @@
 }
 
 .cell {
-  width: 32px;
-  height: 32px;
-  font-size: 0.3rem;
+  width: 100%;
+  height: 100%;
   user-select: none;
   background: url('~/src/assets/images/icons.png') no-repeat;
   background-position-y: center;
