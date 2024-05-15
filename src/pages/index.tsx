@@ -72,18 +72,6 @@ const getCountOfBombsNearby = (
   return count;
 };
 
-const getAdjacentCells = (
-  row: number,
-  cell: number,
-  option: boardOptionType,
-): [number, number][] => {
-  const adjacentCells: [number, number][] = [];
-  iterateAdjacentCells(row, cell, option, (i, j) => {
-    adjacentCells.push([i, j]);
-  });
-  return adjacentCells;
-};
-
 const revealSafeCells = (
   bombMap: (0 | 1)[][],
   userInputs: userInputType[][],
@@ -92,16 +80,37 @@ const revealSafeCells = (
   boardOption: boardOptionType,
 ) => {
   const newUserInputs = structuredClone(userInputs);
-  const stack = [[row, cell]];
-  while (stack.length > 0) {
-    const [currentRow, currentCell] = stack.pop() as [number, number];
-    if (newUserInputs[currentRow][currentCell] !== 0) continue;
-    const bombsNearby = getCountOfBombsNearby(bombMap, currentRow, currentCell, boardOption);
-    newUserInputs[currentRow][currentCell] = -1;
-    if (bombsNearby === 0) {
-      stack.push(...getAdjacentCells(currentRow, currentCell, boardOption));
+
+  const revealCell = (row: number, cell: number) => {
+    // Check boundaries and if the cell is already revealed
+    if (
+      row < 0 ||
+      row >= boardOption.rows ||
+      cell < 0 ||
+      cell >= boardOption.cols ||
+      newUserInputs[row][cell] !== 0
+    ) {
+      return;
     }
-  }
+
+    // Count the number of bombs nearby
+    const bombsNearby = getCountOfBombsNearby(bombMap, row, cell, boardOption);
+    // Mark the cell as revealed
+    newUserInputs[row][cell] = -1;
+
+    // If there are no bombs nearby, reveal adjacent cells
+    if (bombsNearby === 0) {
+      for (let i = row - 1; i <= row + 1; i += 1) {
+        for (let j = cell - 1; j <= cell + 1; j += 1) {
+          if (!(i === row && j === cell)) {
+            revealCell(i, j);
+          }
+        }
+      }
+    }
+  };
+
+  revealCell(row, cell);
   return newUserInputs;
 };
 
