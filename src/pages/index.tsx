@@ -332,11 +332,9 @@ const Home = () => {
                 反映
               </button>
             </div>
-            {customOptionBuff.errorMessages?.map((message) => (
-              <div key={message} className={styles.error}>
-                {message}
-              </div>
-            ))}
+            <div className={styles.errorMessages}>
+              {customOptionBuff.errorMessages?.map((message) => <div key={message}>{message}</div>)}
+            </div>
           </div>
         ) : null}
       </div>
