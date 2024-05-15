@@ -9,6 +9,17 @@ type boardOptionType = {
   custom: boolean;
 };
 
+const directions = [
+  [-1, -1],
+  [-1, 0],
+  [-1, 1],
+  [0, -1],
+  [0, 1],
+  [1, -1],
+  [1, 0],
+  [1, 1],
+];
+
 const difficulties: {
   [key: string]: boardOptionType;
 } = {
@@ -47,14 +58,13 @@ const iterateAdjacentCells = (
   option: boardOptionType,
   callback: (i: number, j: number) => void,
 ) => {
-  for (let i = row - 1; i <= row + 1; i += 1) {
-    for (let j = cell - 1; j <= cell + 1; j += 1) {
-      if (i < 0 || i >= option.rows || j < 0 || j >= option.cols) {
-        continue;
-      }
-      callback(i, j);
+  directions.forEach(([i, j]) => {
+    const newRow = row + i;
+    const newCell = cell + j;
+    if (newRow >= 0 && newRow < option.rows && newCell >= 0 && newCell < option.cols) {
+      callback(newRow, newCell);
     }
-  }
+  });
 };
 
 const getCountOfBombsNearby = (
