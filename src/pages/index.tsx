@@ -47,8 +47,8 @@ const iterateAdjacentCells = (
   option: boardOptionType,
   callback: (i: number, j: number) => void,
 ) => {
-  for (let i = row - 1; i <= row + 1; i += 1) {
-    for (let j = cell - 1; j <= cell + 1; j += 1) {
+  for (let i = row - 1; i <= row + 1; i++) {
+    for (let j = cell - 1; j <= cell + 1; j++) {
       if (i < 0 || i >= option.rows || j < 0 || j >= option.cols) {
         continue;
       }
