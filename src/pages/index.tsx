@@ -163,6 +163,7 @@ const Home = () => {
     rows: number;
     cols: number;
     bombs: number;
+    errorMessages?: string[];
   }>({
     rows: 30,
     cols: 30,
@@ -255,60 +256,86 @@ const Home = () => {
 
   return (
     <div className={styles.container}>
-      <div>
+      <div className={styles.customOptions}>
         <button onClick={() => setDifficulty(difficulties.easy)}>初級</button>
         <button onClick={() => setDifficulty(difficulties.medium)}>中級</button>
         <button onClick={() => setDifficulty(difficulties.hard)}>上級</button>
         <button onClick={() => setDifficulty(difficulties.custom)}>カスタム</button>
+        {boardOption.custom ? (
+          <div className={styles.customOptions}>
+            <div className={styles.fields}>
+              <div className={styles.item}>
+                <label>幅:</label>
+                <input
+                  type="number"
+                  value={customOptionBuff.cols}
+                  min={1}
+                  onChange={(e) =>
+                    setCustomOptionBuff({ ...customOptionBuff, cols: Number(e.target.value) })
+                  }
+                />
+              </div>
+              <div className={styles.item}>
+                <label>高さ:</label>
+                <input
+                  type="number"
+                  value={customOptionBuff.rows}
+                  min={1}
+                  onChange={(e) =>
+                    setCustomOptionBuff({ ...customOptionBuff, rows: Number(e.target.value) })
+                  }
+                />
+              </div>
+              <div className={styles.item}>
+                <label>爆弾の数:</label>
+                <input
+                  type="number"
+                  value={customOptionBuff.bombs}
+                  max={customOptionBuff.rows * customOptionBuff.cols}
+                  onChange={(e) =>
+                    setCustomOptionBuff({ ...customOptionBuff, bombs: Number(e.target.value) })
+                  }
+                />
+              </div>
+              <button
+                className={styles.item}
+                onClick={() => {
+                  console.log(customOptionBuff);
+                  const newErrorMessages: string[] = [];
+                  if (customOptionBuff.bombs >= customOptionBuff.rows * customOptionBuff.cols) {
+                    newErrorMessages.push('爆弾の数が多すぎます');
+                  }
+                  if (customOptionBuff.bombs <= 0) {
+                    newErrorMessages.push('爆弾の数が少なすぎます');
+                  }
+                  if (customOptionBuff.rows <= 0) {
+                    newErrorMessages.push('高さが不正です');
+                  }
+                  if (customOptionBuff.cols <= 0) {
+                    newErrorMessages.push('幅が不正です');
+                  }
+                  setCustomOptionBuff({ ...customOptionBuff, errorMessages: newErrorMessages });
+                  if (newErrorMessages.length > 0) return;
+                  setDifficulty({
+                    rows: customOptionBuff.rows,
+                    cols: customOptionBuff.cols,
+                    bombs: customOptionBuff.bombs,
+                    custom: true,
+                  });
+                }}
+              >
+                反映
+              </button>
+            </div>
+            {customOptionBuff.errorMessages?.map((message) => (
+              <div key={message} className={styles.error}>
+                {message}
+              </div>
+            ))}
+          </div>
+        ) : null}
       </div>
-      {boardOption.custom ? (
-        <div className={styles.options}>
-          <div className={styles.optItem}>
-            <label>幅:</label>
-            <input
-              type="number"
-              value={customOptionBuff.cols}
-              onChange={(e) =>
-                setCustomOptionBuff({ ...customOptionBuff, cols: Number(e.target.value) })
-              }
-            />
-          </div>
-          <div className={styles.optItem}>
-            <label>高さ:</label>
-            <input
-              type="number"
-              value={customOptionBuff.rows}
-              onChange={(e) =>
-                setCustomOptionBuff({ ...customOptionBuff, rows: Number(e.target.value) })
-              }
-            />
-          </div>
-          <div className={styles.optItem}>
-            <label>爆弾の数:</label>
-            <input
-              type="number"
-              value={customOptionBuff.bombs}
-              onChange={(e) =>
-                setCustomOptionBuff({ ...customOptionBuff, bombs: Number(e.target.value) })
-              }
-            />
-          </div>
-          <button
-            className={styles.optItem}
-            onClick={() => {
-              console.log(customOptionBuff);
-              setDifficulty({
-                rows: customOptionBuff.rows,
-                cols: customOptionBuff.cols,
-                bombs: customOptionBuff.bombs,
-                custom: true,
-              });
-            }}
-          >
-            反映
-          </button>
-        </div>
-      ) : null}
+
       <div className={styles.game}>
         <div className={styles.menu}>
           <div className={styles.ndisp}>
@@ -325,8 +352,8 @@ const Home = () => {
         <div
           className={styles.board}
           style={{
-            gridTemplateColumns: `repeat(${boardOption.cols}, 32px)`,
-            gridTemplateRows: `repeat(${boardOption.rows}, 32px)`,
+            gridTemplateColumns: `repeat(${boardOption.cols}, minmax(0, 1fr))`,
+            gridTemplateRows: `repeat(${boardOption.rows}, minmax(0, 1fr))`,
           }}
         >
           {bombMap.map((row, rowIndex) =>
