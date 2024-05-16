@@ -307,18 +307,16 @@ const Home = () => {
                 onClick={() => {
                   console.log(customOptionBuff);
                   const newErrorMessages: string[] = [];
-                  if (customOptionBuff.bombs >= customOptionBuff.rows * customOptionBuff.cols) {
-                    newErrorMessages.push('爆弾の数が多すぎます');
-                  }
-                  if (customOptionBuff.bombs <= 0) {
-                    newErrorMessages.push('爆弾の数が少なすぎます');
-                  }
-                  if (customOptionBuff.rows <= 0) {
-                    newErrorMessages.push('高さが不正です');
-                  }
-                  if (customOptionBuff.cols <= 0) {
-                    newErrorMessages.push('幅が不正です');
-                  }
+                  const { rows, cols, bombs } = customOptionBuff;
+                  const conditions = [
+                    { cond: bombs >= rows * cols, error: '爆弾の数が多すぎます' },
+                    { cond: bombs <= 0, error: '爆弾の数が少なすぎます' },
+                    { cond: rows <= 0, error: '高さが不正です' },
+                    { cond: cols <= 0, error: '幅が不正です' },
+                  ];
+                  conditions.forEach(({ cond, error }) => {
+                    if (cond) newErrorMessages.push(error);
+                  });
                   setCustomOptionBuff({ ...customOptionBuff, errorMessages: newErrorMessages });
                   if (newErrorMessages.length > 0) return;
                   setDifficulty({
