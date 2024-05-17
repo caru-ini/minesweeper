@@ -110,6 +110,10 @@
   border-width: 3px;
 }
 
+.hiddenCell:active {
+  border-color: #7b7b7b #fff #fff #7b7b7b;
+}
+
 .game {
   display: flex;
   flex-direction: column;
