@@ -47,14 +47,25 @@ const iterateAdjacentCells = (
   option: boardOptionType,
   callback: (i: number, j: number) => void,
 ) => {
-  for (let i = row - 1; i <= row + 1; i++) {
-    for (let j = cell - 1; j <= cell + 1; j++) {
-      if (i < 0 || i >= option.rows || j < 0 || j >= option.cols) {
-        continue;
-      }
-      callback(i, j);
+  // Check 8 directions: up, down, left, right, up-left, up-right, down-left, down-right
+  const directions = [
+    [-1, 0], // up
+    [1, 0], // down
+    [0, -1], // left
+    [0, 1], // right
+    [-1, -1], // up-left
+    [-1, 1], // up-right
+    [1, -1], // down-left
+    [1, 1], // down-right
+  ];
+
+  directions.forEach(([dx, dy]) => {
+    const newRow = row + dx;
+    const newCell = cell + dy;
+    if (newRow >= 0 && newRow < option.rows && newCell >= 0 && newCell < option.cols) {
+      callback(newRow, newCell);
     }
-  }
+  });
 };
 
 const getCountOfBombsNearby = (
@@ -64,6 +75,9 @@ const getCountOfBombsNearby = (
   option: boardOptionType,
 ) => {
   let count = 0;
+  if (bombMap[row][cell] === 1) {
+    return 0;
+  }
   iterateAdjacentCells(row, cell, option, (i, j) => {
     if (bombMap[i][j]) {
       count += 1;
@@ -82,27 +96,15 @@ const revealSafeCells = (
   const newUserInputs = structuredClone(userInputs);
 
   const revealCell = (row: number, cell: number) => {
-    if (
-      row < 0 ||
-      row >= boardOption.rows ||
-      cell < 0 ||
-      cell >= boardOption.cols ||
-      newUserInputs[row][cell] !== 0
-    ) {
-      return;
-    }
+    if (newUserInputs?.[row]?.[cell] !== 0) return;
 
     const bombsNearby = getCountOfBombsNearby(bombMap, row, cell, boardOption);
     newUserInputs[row][cell] = -1;
 
     if (bombsNearby === 0) {
-      for (let i = row - 1; i <= row + 1; i += 1) {
-        for (let j = cell - 1; j <= cell + 1; j += 1) {
-          if (!(i === row && j === cell)) {
-            revealCell(i, j);
-          }
-        }
-      }
+      iterateAdjacentCells(row, cell, boardOption, (i, j) => {
+        revealCell(i, j);
+      });
     }
   };
 
@@ -136,19 +138,19 @@ const calculatePosition = (
 };
 
 const shouldHideBackgroundImage = (
-  userInputs: userInputType[][],
-  rowIndex: number,
-  colIndex: number,
+  cell: 0 | 1,
+  userInput: userInputType,
   count: number,
-  bombMap: (0 | 1)[][],
-  gameOver: boolean,
   win: boolean,
+  gameOver: boolean,
 ): boolean => {
-  return (
-    userInputs[rowIndex][colIndex] === 0 ||
-    (userInputs[rowIndex][colIndex] <= 0 && count === 0) ||
-    (!bombMap[rowIndex][colIndex] && (gameOver || win))
-  );
+  // show all bombs and hide count when game is over
+  if (win || gameOver) return cell !== 1;
+  // show background image if cell is not opened and flag or question mark is attached
+  if (userInput > 0) return false;
+  // show background image if cell is opened and count is not 0
+  if (userInput === -1 && count !== 0) return false;
+  return true;
 };
 
 const getClassName = (
@@ -305,7 +307,6 @@ const Home = () => {
               <button
                 className={styles.item}
                 onClick={() => {
-                  console.log(customOptionBuff);
                   const newErrorMessages: string[] = [];
                   const { rows, cols, bombs } = customOptionBuff;
                   const conditions = [
@@ -375,13 +376,11 @@ const Home = () => {
                   style={{
                     backgroundPositionX: position,
                     backgroundImage: shouldHideBackgroundImage(
-                      userInputs,
-                      rowIndex,
-                      colIndex,
+                      cell,
+                      userInputs[rowIndex][colIndex],
                       count,
-                      bombMap,
-                      gameOver,
                       win,
+                      gameOver,
                     )
                       ? 'none'
                       : undefined,
@@ -398,6 +397,7 @@ const Home = () => {
                 >
                   {/* debug & cheat */}
                   {/* {userInputs[rowIndex][colIndex]} */}
+                  {/* {count} */}
                   {/* {cell === 1 ? '💣' : ''} */}
                 </div>
               );
