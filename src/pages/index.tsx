@@ -47,7 +47,6 @@ const iterateAdjacentCells = (
   option: boardOptionType,
   callback: (i: number, j: number) => void,
 ) => {
-  // Check 8 directions: up, down, left, right, up-left, up-right, down-left, down-right
   const directions = [
     [-1, 0], // up
     [1, 0], // down
