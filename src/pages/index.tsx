@@ -275,7 +275,6 @@ const Home = () => {
                 <input
                   type="number"
                   value={customOptionBuff.cols}
-                  min={1}
                   onChange={(e) =>
                     setCustomOptionBuff({ ...customOptionBuff, cols: Number(e.target.value) })
                   }
@@ -286,7 +285,6 @@ const Home = () => {
                 <input
                   type="number"
                   value={customOptionBuff.rows}
-                  min={1}
                   onChange={(e) =>
                     setCustomOptionBuff({ ...customOptionBuff, rows: Number(e.target.value) })
                   }
