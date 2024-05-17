@@ -268,7 +268,7 @@ const Home = () => {
           </button>
         ))}
         {boardOption.label === 'カスタム' ? (
-          <div>
+          <div className={styles.customOptionContainer}>
             <div className={styles.fields}>
               <div className={styles.item}>
                 <label>幅:</label>
