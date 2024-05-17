@@ -113,11 +113,6 @@ const revealSafeCells = (
 
 const isWin = (bombMap: (0 | 1)[][], userInputs: userInputType[][]): boolean => {
   // win when all cells are opened except bombs
-  console.log(
-    bombMap
-      .flat()
-      .every((cell, index) => (cell === 0 && userInputs.flat()[index] === -1) || cell === 1),
-  );
   return bombMap
     .flat()
     .every((cell, index) => (cell === 0 && userInputs.flat()[index] === -1) || cell === 1);
