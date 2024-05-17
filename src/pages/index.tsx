@@ -119,7 +119,8 @@ const isWin = (bombMap: (0 | 1)[][], userInputs: userInputType[][]): boolean => 
 };
 
 const isGameOver = (bombMap: (0 | 1)[][], userInputs: userInputType[][]): boolean => {
-  return bombMap.flat().some((cell, index) => cell === 1 && userInputs.flat()[index] === -1);
+  console.log(bombMap.flat(), userInputs.flat());
+  return userInputs.filter((row) => row.includes(-2)).length > 0;
 };
 
 const calculatePosition = (
