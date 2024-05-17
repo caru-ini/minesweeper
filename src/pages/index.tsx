@@ -268,7 +268,7 @@ const Home = () => {
         <button onClick={() => setDifficulty(difficulties.hard)}>上級</button>
         <button onClick={() => setDifficulty(difficulties.custom)}>カスタム</button>
         {boardOption.custom ? (
-          <div className={styles.customOptions}>
+          <div>
             <div className={styles.fields}>
               <div className={styles.item}>
                 <label>幅:</label>
@@ -304,7 +304,7 @@ const Home = () => {
                 />
               </div>
               <button
-                className={styles.item}
+                className={styles.applyButton}
                 onClick={() => {
                   const newErrorMessages: string[] = [];
                   const { rows, cols, bombs } = customOptionBuff;

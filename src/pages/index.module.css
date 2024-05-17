@@ -3,20 +3,20 @@
   flex-direction: column;
   min-width: 100vw;
   min-height: 100vh;
-  background: #595656;
+  background: #191a1b;
 }
 
 .customOptions {
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin: 0.3rem 0 0 0.3rem;
+  margin: 0.3rem 0 0.3rem 0.3rem;
 }
 
 .fields {
   display: flex;
   gap: 10px;
-  margin: 10px;
+  margin-left: 10px;
 }
 
 .item {
@@ -31,6 +31,29 @@
 
 .item input[type='number'] {
   width: 3rem;
+}
+
+.customOptions > button {
+  font-size: 1rem;
+  color: skyblue;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.customOptions button:hover {
+  color: white;
+}
+
+.applyButton {
+  color: white;
+  background: gray;
+  border: none;
+  border-radius: 5px;
+}
+
+.applyButton:hover {
+  background: lightgray;
 }
 
 .errorMessages {
