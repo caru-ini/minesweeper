@@ -112,9 +112,15 @@ const revealSafeCells = (
 };
 
 const isWin = (bombMap: (0 | 1)[][], userInputs: userInputType[][]): boolean => {
-  if (bombMap.flat().every((cell) => cell === 0)) return false;
-  const flags: (1 | 0)[] = userInputs.flat().map((cell) => (cell === 2 ? 1 : 0));
-  return flags.every((cell, index) => cell === bombMap.flat()[index]);
+  // win when all cells are opened except bombs
+  console.log(
+    bombMap
+      .flat()
+      .every((cell, index) => (cell === 0 && userInputs.flat()[index] === -1) || cell === 1),
+  );
+  return bombMap
+    .flat()
+    .every((cell, index) => (cell === 0 && userInputs.flat()[index] === -1) || cell === 1);
 };
 
 const isGameOver = (bombMap: (0 | 1)[][], userInputs: userInputType[][]): boolean => {
@@ -130,7 +136,7 @@ const calculatePosition = (
   colIndex: number,
   count: number,
 ): string => {
-  if (win) return '-268px'; // hack: なぜか右のスプライトが見えてしまうので
+  if (win && cell === 1) return '-270px';
   if (gameOver) return `-${(cell === 1 ? 10 : 0) * 30 - 1}px`;
   if (userInputs[rowIndex][colIndex] > 0) return `-${(userInputs[rowIndex][colIndex] + 7) * 30}px`;
   return `-${(count - 1) * 30}px`;
@@ -159,7 +165,7 @@ const getClassName = (
   win: boolean,
   styles: { readonly [key: string]: string },
 ): string => {
-  return userInputs[rowIndex][colIndex] <= -1 || win ? styles.cell : styles.hiddenCell;
+  return userInputs[rowIndex][colIndex] <= -1 ? styles.cell : styles.hiddenCell;
 };
 
 const Home = () => {
@@ -199,6 +205,13 @@ const Home = () => {
   ]);
 
   const win = isWin(bombMap, userInputs);
+  if (win) {
+    userInputs.forEach((row, i) =>
+      row.forEach((cell, j) => {
+        if (bombMap[i][j] === 1) userInputs[i][j] = 2;
+      }),
+    );
+  }
   const gameOver = win ? false : isGameOver(bombMap, userInputs);
 
   // Timer
