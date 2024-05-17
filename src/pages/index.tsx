@@ -119,7 +119,6 @@ const isWin = (bombMap: (0 | 1)[][], userInputs: userInputType[][]): boolean => 
 };
 
 const isGameOver = (bombMap: (0 | 1)[][], userInputs: userInputType[][]): boolean => {
-  console.log(bombMap.flat(), userInputs.flat());
   return userInputs.filter((row) => row.includes(-2)).length > 0;
 };
 
