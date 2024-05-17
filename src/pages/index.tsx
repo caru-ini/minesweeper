@@ -266,11 +266,7 @@ const Home = () => {
     <div className={styles.container}>
       <div className={styles.customOptions}>
         {Object.values(difficulties).map((difficulty) => (
-          <button
-            key={difficulty.label}
-            className={styles.difficultyButton}
-            onClick={() => setDifficulty(difficulty)}
-          >
+          <button key={difficulty.label} onClick={() => setDifficulty(difficulty)}>
             {difficulty.label}
           </button>
         ))}
