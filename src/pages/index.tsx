@@ -3,19 +3,19 @@ import { useEffect, useState } from 'react';
 
 type userInputType = -1 | 0 | 1 | 2; // 0: none, -1: revealed, 1: question, 2: flag
 type boardOptionType = {
+  label: string;
   rows: number;
   cols: number;
   bombs: number;
-  custom: boolean;
 };
 
 const difficulties: {
   [key: string]: boardOptionType;
 } = {
-  easy: { rows: 9, cols: 9, bombs: 10, custom: false },
-  medium: { rows: 16, cols: 16, bombs: 40, custom: false },
-  hard: { rows: 16, cols: 30, bombs: 99, custom: false },
-  custom: { rows: 30, cols: 30, bombs: 150, custom: true },
+  easy: { label: '初級', rows: 9, cols: 9, bombs: 10 },
+  medium: { label: '中級', rows: 16, cols: 16, bombs: 40 },
+  hard: { label: '上級', rows: 16, cols: 30, bombs: 99 },
+  custom: { label: 'カスタム', rows: 30, cols: 30, bombs: 150 },
 };
 
 const createEmptyBoard = (rows: number, cols: number): (0 | 1)[][] => {
@@ -248,12 +248,7 @@ const Home = () => {
     setuserInputs(newUserInputs);
   };
 
-  const setDifficulty = (difficulty: {
-    rows: number;
-    cols: number;
-    bombs: number;
-    custom: boolean;
-  }) => {
+  const setDifficulty = (difficulty: boardOptionType) => {
     setBoardOption(difficulty);
     setTime(0);
     setBombMap(createEmptyBoard(difficulty.rows, difficulty.cols));
@@ -263,11 +258,16 @@ const Home = () => {
   return (
     <div className={styles.container}>
       <div className={styles.customOptions}>
-        <button onClick={() => setDifficulty(difficulties.easy)}>初級</button>
-        <button onClick={() => setDifficulty(difficulties.medium)}>中級</button>
-        <button onClick={() => setDifficulty(difficulties.hard)}>上級</button>
-        <button onClick={() => setDifficulty(difficulties.custom)}>カスタム</button>
-        {boardOption.custom ? (
+        {Object.values(difficulties).map((difficulty) => (
+          <button
+            key={difficulty.label}
+            className={styles.difficultyButton}
+            onClick={() => setDifficulty(difficulty)}
+          >
+            {difficulty.label}
+          </button>
+        ))}
+        {boardOption.label === 'カスタム' ? (
           <div>
             <div className={styles.fields}>
               <div className={styles.item}>
@@ -320,10 +320,10 @@ const Home = () => {
                   setCustomOptionBuff({ ...customOptionBuff, errorMessages: newErrorMessages });
                   if (newErrorMessages.length > 0) return;
                   setDifficulty({
+                    label: 'カスタム',
                     rows: customOptionBuff.rows,
                     cols: customOptionBuff.cols,
                     bombs: customOptionBuff.bombs,
-                    custom: true,
                   });
                 }}
               >
