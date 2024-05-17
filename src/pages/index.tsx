@@ -1,7 +1,7 @@
 import styles from './index.module.css';
 import { useEffect, useState } from 'react';
 
-type userInputType = -1 | 0 | 1 | 2; // 0: none, -1: revealed, 1: question, 2: flag
+type userInputType = -2 | -1 | 0 | 1 | 2; // 0: none, -2 trigger, -1: revealed, 1: question, 2: flag
 type boardOptionType = {
   label: string;
   rows: number;
@@ -144,7 +144,7 @@ const shouldHideBackgroundImage = (
   gameOver: boolean,
 ): boolean => {
   // show all bombs and hide count when game is over
-  if (win || gameOver) return cell !== 1;
+  if ((win || gameOver) && cell === 1) return false;
   // show background image if cell is not opened and flag or question mark is attached
   if (userInput > 0) return false;
   // show background image if cell is opened and count is not 0
@@ -159,7 +159,7 @@ const getClassName = (
   win: boolean,
   styles: { readonly [key: string]: string },
 ): string => {
-  return userInputs[rowIndex][colIndex] === -1 || win ? styles.cell : styles.hiddenCell;
+  return userInputs[rowIndex][colIndex] <= -1 || win ? styles.cell : styles.hiddenCell;
 };
 
 const Home = () => {
@@ -224,7 +224,13 @@ const Home = () => {
 
     if (bombMap[rowIndex][colIndex] === 1) {
       console.log('Game Over');
-      setuserInputs(newBombMap.map((row) => row.map(() => -1)));
+      // reveal all bombs
+      const oldUserInputs = structuredClone(userInputs);
+      const newInputs = oldUserInputs.map((row, i) =>
+        row.map((cell, j) => (bombMap[i][j] === 1 ? -1 : cell)),
+      );
+      newInputs[rowIndex][colIndex] = -2;
+      setuserInputs(newInputs);
       return;
     }
 
@@ -242,7 +248,8 @@ const Home = () => {
     newUserInputs[rowIndex][colIndex] = currentInput === 0 ? 2 : currentInput === 2 ? 1 : 0;
     if (isWin(bombMap, newUserInputs)) {
       console.log('Win');
-      setuserInputs(newUserInputs.map((row) => row.map((c) => (c === 2 ? 2 : -1))));
+      // reveal all bombs
+      setuserInputs(bombMap.map((row) => row.map((cell) => (cell === 1 ? -1 : 0))));
       return;
     }
     setuserInputs(newUserInputs);
@@ -381,6 +388,7 @@ const Home = () => {
                     )
                       ? 'none'
                       : undefined,
+                    backgroundColor: userInputs[rowIndex][colIndex] === -2 ? 'red' : undefined,
                   }}
                   className={getClassName(userInputs, rowIndex, colIndex, win, styles)}
                   onClick={(e) => {
