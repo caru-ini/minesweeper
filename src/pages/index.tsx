@@ -1,14 +1,10 @@
 import styles from './index.module.css';
-import type { boardOptionType } from '../hooks/game';
 import { difficulties, useGame } from '../hooks/game';
 import { useState } from 'react';
 import { TopArea } from '../components/topArea';
 import { Board } from '../components/board';
 const Home = () => {
   const { board, clickHandlers, bombCount, gameStatus, resetGame, setBoardOption } = useGame();
-  const setDifficulty = (difficulty: boardOptionType) => {
-    setBoardOption(difficulty);
-  };
   const [customOptionBuff, setCustomOptionBuff] = useState<{
     rows: number;
     cols: number;
@@ -22,7 +18,7 @@ const Home = () => {
     <div className={styles.container}>
       <div className={styles.customOptions}>
         {Object.values(difficulties).map((difficulty) => (
-          <button key={difficulty.label} onClick={() => setDifficulty(difficulty)}>
+          <button key={difficulty.label} onClick={() => setBoardOption(difficulty)}>
             {difficulty.label}
           </button>
         ))}
@@ -76,7 +72,7 @@ const Home = () => {
                   });
                   setCustomOptionBuff({ ...customOptionBuff, errorMessages: newErrorMessages });
                   if (newErrorMessages.length > 0) return;
-                  setDifficulty({
+                  setBoardOption({
                     label: 'カスタム',
                     rows: customOptionBuff.rows,
                     cols: customOptionBuff.cols,
