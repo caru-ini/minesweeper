@@ -50,15 +50,6 @@ const shouldHideBackgroundImage = (
   return true;
 };
 
-const getClassName = (
-  userInputs: userInputType[][],
-  rowIndex: number,
-  colIndex: number,
-  styles: { readonly [key: string]: string },
-): string => {
-  return userInputs[rowIndex][colIndex] <= -1 ? styles.cell : styles.hiddenCell;
-};
-
 export const Board: React.FC<BoardProps> = ({ board, clickHandlers }) => {
   const { bombMap, userInputs } = board;
   const { leftClickHandler, rightClickHandler } = clickHandlers;
@@ -90,7 +81,7 @@ export const Board: React.FC<BoardProps> = ({ board, clickHandlers }) => {
                   : undefined,
                 backgroundColor: userInputs[rowIndex][colIndex] === -2 ? 'red' : undefined,
               }}
-              className={getClassName(userInputs, rowIndex, colIndex, styles)}
+              className={userInputs[rowIndex][colIndex] <= -1 ? styles.cell : styles.hiddenCell}
               onClick={(e) => {
                 e.preventDefault();
                 leftClickHandler(rowIndex, colIndex);
