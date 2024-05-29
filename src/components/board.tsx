@@ -7,7 +7,7 @@ import {
 
 import styles from '../pages/index.module.css';
 
-type BoardProps = {
+interface BoardProps {
   board: {
     bombMap: (0 | 1)[][];
     userInputs: userInputType[][];
@@ -17,7 +17,7 @@ type BoardProps = {
     leftClickHandler: (row: number, cell: number) => void;
     rightClickHandler: (row: number, cell: number) => void;
   };
-};
+}
 
 const calculatePosition = (
   cell: number,

@@ -2,11 +2,11 @@ import type { gameStatusType } from '../hooks/game';
 
 import styles from '../pages/index.module.css';
 
-type TopAreaProps = {
+interface TopAreaProps {
   bombCount: number;
   gameStatus: gameStatusType;
   resetGame: () => void;
-};
+}
 
 export const TopArea: React.FC<TopAreaProps> = ({ bombCount, gameStatus, resetGame }) => {
   return (

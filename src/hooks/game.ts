@@ -133,8 +133,15 @@ const revealSafeCells = (
 };
 export const getPhase = (bombMap: (0 | 1)[][], userInputs: userInputType[][]): 0 | 1 | 2 => {
   if (bombMap.flat().every((cell) => cell === 0)) return 0;
+  // if lose trigger is found
   if (userInputs.flat().some((cell) => cell === -2)) return 2;
-  if (bombMap.flat().every((cell) => cell === 0)) return 1;
+  // if win ( all cells without bomb are revealed )
+  if (
+    bombMap.filter((row, i) => row.every((cell, j) => cell === 1 || userInputs[i][j] === -1))
+      .length === bombMap.length
+  ) {
+    return 1;
+  }
   return 0;
 };
 
@@ -166,6 +173,7 @@ export const useGame = (): Game => {
   };
 
   const phase = getPhase(bombMap, userInputs);
+  console.log(phase);
 
   if (phase === 1) {
     userInputs.forEach((row, i) =>
