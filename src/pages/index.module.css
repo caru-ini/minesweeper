@@ -158,7 +158,8 @@
 .ndisp {
   width: 72px;
   height: 36px;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
+  line-height: 33px;
   color: red;
   text-align: center;
   background: black;
